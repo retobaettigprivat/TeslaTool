@@ -5,7 +5,7 @@ var bodyParser = require("body-parser");
 const app = express();
 
 //let PORT = process.env.PORT;
-let PORT = 3000;
+let PORT = process.env.port || 3000;;
 
 function getToken(req) {
     let prefix='Bearer ';
