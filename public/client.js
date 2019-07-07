@@ -26,16 +26,34 @@ function renderLoggedIn() {
     Hide("divlogin");
     Show("divlogout");
     Show("mainpage");
-    }
+}
 function renderLoggedOut() {
     Show("divlogin");
     Hide("divlogout");
     Hide("mainpage");
 }
 
+function renderInfos() {
+    /*let s="<table></table><tr><td>hello</td><td>hello Reto</td></tr></table>";
+    let e = Elem("infos");
+    e.innerHTML=s;*/
+    let e = Elem("infotable");
+
+    let r = new Array();
+    for (let key in tesladata){
+        r.push('<tr><td>');
+        r.push(key);
+        r.push('</td><td>');
+        r.push(tesladata[key]);
+        r.push('</td></tr>');
+    }
+    e.innerHTML=r.join('');
+}
+
 function render() {
     if (appstate.isLoggedIn()) {
         renderLoggedIn();
+        renderInfos();
     } else {
         renderLoggedOut();
     }
@@ -92,6 +110,7 @@ function login() {
         .then(result => {
             if (result.success) {
                 appstate.accessToken = result.data.access_token;
+                getInfo();
                 render();
             } else {
                 window.alert("Access denied");
@@ -112,7 +131,8 @@ function logout() {
 function getInfo() {
     apiFetch('./api/getinfo', 'GET')
         .then(data => {
-            log(JSON.stringify(data));
+            teslaParseData(data);
+            render();
         });
 }
 

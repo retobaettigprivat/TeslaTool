@@ -11,3 +11,22 @@
     top: 0px;
     left: 0px;
 }
+
+body {
+    font-family: "Verdana", "Arial", sans-serif;
+}
+
+label {
+    font-size: 12px;
+    display: block;
+    width : 200px;
+}
+
+input {
+    font-size: 12px;
+    display: block;
+    width : 200px;
+    border-style: none;
+    border-bottom: solid black 1px;
+    background-color: white;
+}

@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Tesla Tool</title>
-    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 </head>
 <body>
 
 <div id="wait" style="display: none">Wait...</div>
+<div id="title">
+    <h1>Tesla Tool</h1>
+</div>
 
 <div id="divlogin">
     <form id="loginform" onsubmit="return login();">
-        <label>Email:</label><input id="email" type="text"><br>
-        <label>Password:</label><input id="pword" type="password"><br>
+        <h4>Login</h4>
+        <input id="email" type="text"  placeholder="email"><br>
+        <input id="pword" type="password" placeholder="password"><br>
         <button>Login</button>
     </form>
 </div>
@@ -22,18 +24,24 @@
 <div id="divlogout" style="display: none">
     <button onclick="logout()">Logout</button>
 </div>
-
+<hr>
 <div id="mainpage" style="display: none">
-    <button onclick="getInfo()">Get Info</button>
-    <button onclick="wakeUp()">Wakeup</button>
-    <button onclick="honkHorn()">Honk</button>
-    <button onclick="flashLights()">Flash</button>
-    <button onclick="sentryOn()">SentryOn</button>
-    <button onclick="sentryOff()">SentryOff</button>
+    <div id="commands">
+        <button onclick="getInfo()">Get Info</button>
+        <button onclick="wakeUp()">Wakeup</button>
+        <button onclick="honkHorn()">Honk</button>
+        <button onclick="flashLights()">Flash</button>
+        <button onclick="sentryOn()">SentryOn</button>
+        <button onclick="sentryOff()">SentryOff</button>
+    </div>
+    <hr>
+    <div id="infos">
+        <table id="infotable"></table>
+    </div>
 </div>
 
 <div id="logdiv"></div>
-
+<script src="tesladata.js" type="application/javascript"></script>
 <script src="client.js" type="application/javascript"></script>
 </body>
 </html>
