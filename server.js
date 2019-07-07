@@ -1,17 +1,18 @@
+"use strict"
 const logger = require('./logger.js');
 const tesla = require('./tesla.js');
 const express = require('express');
-var bodyParser = require("body-parser");
+let bodyParser = require("body-parser");
 const app = express();
 
 //let PORT = process.env.PORT;
-let PORT = process.env.port || 3000;;
+let PORT = process.env.PORT || 3000;
 
 function getToken(req) {
     let prefix='Bearer ';
     let t = req.get('authorization');
     if (!t) { return false;}
-    if (t.indexOf(prefix) == 0) {
+    if (t.indexOf(prefix) === 0) {
         t = t.substring(prefix.length, t.length);
     }
     return t;
@@ -69,6 +70,19 @@ app.post('/api/wakeup', (req, res) => {
     handleSimplePromise(tesla.wakeUp(getToken(req), 0), res);
 });
 
+app.post('/api/honkhorn', (req, res) => {
+    handleSimplePromise(tesla.honkHorn(getToken(req), 0), res);
+});
+
+app.post('/api/flashlights', (req, res) => {
+    handleSimplePromise(tesla.flashLights(getToken(req), 0), res);
+});
+
+app.post('/api/setsentrymode', (req, res) => {
+    let on = req.body.value;
+    handleSimplePromise(tesla.setSentryMode(getToken(req), 0, on), res);
+});
+
 app.post('/api/logout', (req, res) => {
     handleSimplePromise(tesla.logout(getToken(req)), res);
 });
@@ -76,3 +90,4 @@ app.post('/api/logout', (req, res) => {
 app.listen(PORT, () =>
     logger.log(`Example app listening on port ${PORT}!`),
 );
+

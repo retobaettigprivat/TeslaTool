@@ -1,6 +1,7 @@
+"use strict";
 let appstate = {
     accessToken : false,
-    isLoggedIn : () => { return appstate.accessToken!=false; },
+    isLoggedIn : () => { return appstate.accessToken!==false; },
 };
 
 function Elem(id) {
@@ -34,8 +35,8 @@ function render() {
 
 function log(str) {
     console.log(str);
-    var l = document.getElementById("logdiv");
-    if (typeof l != "undefined") {
+    let l = document.getElementById("logdiv");
+    if (typeof l !== "undefined") {
         l.innerHTML+=str + "<br>\n";
     }
 }
@@ -113,4 +114,33 @@ function wakeUp() {
             log(JSON.stringify(data));
         });
 }
+
+function flashLights() {
+    apiFetch('./api/flashlights', 'POST')
+        .then(data => {
+            log(JSON.stringify(data));
+        });
+}
+
+function honkHorn() {
+    apiFetch('./api/honkhorn', 'POST')
+        .then(data => {
+            log(JSON.stringify(data));
+        });
+}
+
+function sentryOn() {
+    apiFetch('./api/setsentrymode', 'POST', {value: true})
+        .then(data => {
+            log(JSON.stringify(data));
+        });
+}
+
+function sentryOff() {
+    apiFetch('./api/setsentrymode', 'POST', {value: false})
+        .then(data => {
+            log(JSON.stringify(data));
+        });
+}
+
 
