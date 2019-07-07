@@ -1,4 +1,10 @@
 "use strict";
+
+if (location.protocol != 'https:' && window.location.href.indexOf('localhost')==-1)
+{
+    location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+}
+
 let appstate = {
     accessToken : false,
     isLoggedIn : () => { return appstate.accessToken!==false; },
