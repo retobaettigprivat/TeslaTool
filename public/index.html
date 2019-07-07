@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Tesla Tool</title>
+</head>
+<body>
+
+<div id="wait" style="display: none">Wait...</div>
+
+<div id="divlogin">
+    <form id="loginform" onsubmit="return login();">
+        <label>Email:</label><input id="email" type="text"><br>
+        <label>Password:</label><input id="pword" type="password"><br>
+        <button>Login</button>
+    </form>
+</div>
+
+<div id="divlogout" style="display: none">
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div id="mainpage" style="display: none">
+    <button onclick="getInfo()">Get Info</button>
+    <button onclick="wakeUp()">Wakeup</button>
+</div>
+
+<div id="logdiv"></div>
+
+<script src="client.js" type="application/javascript"></script>
+</body>
+</html>
