@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Tesla Tool</title>
 </head>
 <body>
 
-<div id="wait" style="display: none">Wait...</div>
 <div id="title">
     <h1>Tesla Tool</h1>
 </div>
+
+<div id="wait" style="display: none"></div>
 
 <div id="divlogin">
     <form id="loginform" onsubmit="return login();">
@@ -28,16 +30,27 @@
 <div id="mainpage" style="display: none">
     <div id="commands">
         <button onclick="getInfo()">Get Info</button>
+        <button onclick="showRawData(true)">Show raw data</button>
         <button onclick="wakeUp()">Wakeup</button>
         <button onclick="honkHorn()">Honk</button>
         <button onclick="flashLights()">Flash</button>
         <button onclick="sentryOn()">SentryOn</button>
         <button onclick="sentryOff()">SentryOff</button>
+        <button onclick="LockDoors()">Lock</button>
+        <button onclick="UnlockDoors()">Unlock</button>
+        <button onclick="openTrunk()">Open Trunk</button>
+        <button onclick="openFrunk()">Open Frunk</button>
     </div>
     <hr>
     <div id="infos">
         <table id="infotable"></table>
     </div>
+    <hr>
+</div>
+<div id="rawdata" style="display: none">
+    <div id="rawdatatext"></div>
+    <button onclick="showRawData(false)">Hide raw data</button>
+    <hr>
 </div>
 
 <div id="logdiv"></div>

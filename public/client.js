@@ -1,10 +1,10 @@
 "use strict";
 
-/*
+
 if (location.protocol != 'https:' && window.location.href.indexOf('localhost')==-1)
 {
     location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
-}*/
+}
 
 
 let appstate = {
@@ -86,12 +86,13 @@ let getDefaultOptions = function (method) {
     return opts;
 };
 
-function apiFetch(url, method, data) {
+function apiFetchFgBg(url, method, foreground, data) {
     let opts= getDefaultOptions(method);
     if (typeof data !== 'undefined') {
         opts.body=JSON.stringify(data);
     }
-    Show("wait");
+
+    if (foreground) { Show("wait"); }
     return fetch(url, opts)
         .then((response) => {
             Hide("wait");
@@ -109,6 +110,15 @@ function apiFetch(url, method, data) {
         });
 }
 
+function apiFetch (url, method, data) {
+    return apiFetchFgBg(url, method, true, data);
+}
+
+function apiFetchBg (url, method, data) {
+    return apiFetchFgBg(url, method, false, data);
+}
+
+
 function login() {
     let email = document.getElementById("email").value;
     let pw = document.getElementById("pword").value;
@@ -125,64 +135,75 @@ function login() {
     return false;
 }
 
-function logout() {
-    appstate.accessToken = false;
-    apiFetch('./api/logout', 'POST')
-        .then(data => {
-            log(JSON.stringify(data));
-        });
-    render();
-}
-
 function getInfo() {
-    apiFetch('./api/getinfo', 'GET')
+    apiFetchBg('./api/getinfo', 'GET')
         .then(data => {
+            teslarawdata = data.data.response;
             teslaParseData(data);
             render();
         });
 }
 
+function showRawData(on) {
+    if (on) {
+        Show("rawdata");
+        Elem("rawdatatext").innerHTML = JSON.stringify(teslarawdata, null, "<br>");
+    } else {
+        Hide("rawdata");
+    }
+}
+
+function standardApiCall(url, method, value) {
+    return apiFetch(url, method, value)
+        .then(res => {
+            if (!res.data.response.result) {
+                log(JSON.stringify(res));
+            }
+            getInfo();
+        });
+}
+
+function logout() {
+    appstate.accessToken = false;
+    standardApiCall('./api/logout', 'POST');
+    render();
+}
+
 function wakeUp() {
-    apiFetch('./api/wakeup', 'POST')
+    standardApiCall('./api/wakeup', 'POST')
         .then(res => {
             tesladata.state = res.data.response.state;
         });
 }
 
 function flashLights() {
-    apiFetch('./api/flashlights', 'POST')
-        .then(res => {
-            if (!res.data.response.result) {
-                log(JSON.stringify(res));
-            }
-        });
+    standardApiCall('./api/flashlights', 'POST');
 }
 
 function honkHorn() {
-    apiFetch('./api/honkhorn', 'POST')
-        .then(data => {
-            if (!res.data.response.result) {
-                log(JSON.stringify(res));
-            }
-        });
+    standardApiCall('./api/honkhorn', 'POST');
 }
 
 function sentryOn() {
-    apiFetch('./api/setsentrymode', 'POST', {value: true})
-        .then(data => {
-            if (!res.data.response.result) {
-                log(JSON.stringify(res));
-            }
-        });
+    standardApiCall('./api/setsentrymode', 'POST', {value: true});
 }
 
 function sentryOff() {
-    apiFetch('./api/setsentrymode', 'POST', {value: false})
-        .then(data => {
-            if (!res.data.response.result) {
-                log(JSON.stringify(res));
-            }
-        });
+    standardApiCall('./api/setsentrymode', 'POST', {value: false});
 }
 
+function LockDoors() {
+    standardApiCall('./api/lockdoors', 'POST');
+}
 
+function UnlockDoors() {
+    standardApiCall('./api/unlockdoors', 'POST');
+}
+
+function openTrunk() {
+    standardApiCall('./api/opentrunk', 'POST');
+}
+
+function openFrunk() {
+    standardApiCall('./api/openfrunk', 'POST');
+}

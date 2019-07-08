@@ -2,6 +2,7 @@
 
 const unknown = "(unknown)";
 
+let teslarawdata = unknown;
 let tesladata = {
     name : unknown,
     battery_level : unknown,
@@ -13,6 +14,7 @@ let tesladata = {
     longitude: unknown,
     locked: unknown,
     sentry_mode: unknown,
+    odometer: unknown,
 };
 
 let teslaParseData = function(data) {
@@ -33,6 +35,7 @@ let teslaParseData = function(data) {
         if (typeof d.drive_state.longitude !== 'undefined') { tesladata.longitude = d.drive_state.longitude};
         if (typeof d.vehicle_state.locked !== 'undefined') { tesladata.locked = d.vehicle_state.locked};
         if (typeof d.vehicle_state.sentry_mode !== 'undefined') { tesladata.sentry_mode = d.vehicle_state.sentry_mode};
+        if (typeof d.vehicle_state.odometer !== 'undefined') { tesladata.odometer = d.vehicle_state.odometer};
 
     } catch {
         log(data);

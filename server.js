@@ -66,6 +66,10 @@ app.get('/api/getinfo', (req, res) => {
         });
 });
 
+app.get('/api/getvehicles', (req, res) => {
+    handleSimplePromise(tesla.getVehicles(getToken(req), 0), res);
+});
+
 app.post('/api/wakeup', (req, res) => {
     handleSimplePromise(tesla.wakeUp(getToken(req), 0), res);
 });
@@ -85,6 +89,22 @@ app.post('/api/setsentrymode', (req, res) => {
 
 app.post('/api/logout', (req, res) => {
     handleSimplePromise(tesla.logout(getToken(req)), res);
+});
+
+app.post('/api/lockdoors', (req, res) => {
+    handleSimplePromise(tesla.lockDoors(getToken(req),0), res);
+});
+
+app.post('/api/unlockdoors', (req, res) => {
+    handleSimplePromise(tesla.unlockDoors(getToken(req),0), res);
+});
+
+app.post('/api/opentrunk', (req, res) => {
+    handleSimplePromise(tesla.openTrunk(getToken(req),0), res);
+});
+
+app.post('/api/openfrunk', (req, res) => {
+    handleSimplePromise(tesla.openFrunk(getToken(req),0), res);
 });
 
 app.listen(PORT, () =>

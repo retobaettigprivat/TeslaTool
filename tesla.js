@@ -125,5 +125,8 @@ module.exports = {
     honkHorn: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/honk_horn'),
     flashLights: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/flash_lights'),
     setSentryMode: (access_token, id, on) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/set_sentry_mode', { 'on' : on }),
-
+    lockDoors: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/door_lock'),
+    unlockDoors: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/door_unlock'),
+    openTrunk: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'rear' }),
+    openFrunk: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'front' }),
 };

@@ -30,3 +30,27 @@ input {
     border-bottom: solid black 1px;
     background-color: white;
 }
+
+button {
+    margin: 5px;
+}
+
+table {
+    font-size: 12px;
+}
+
+div {
+    font-size: 12px;
+}
+
+@media only screen and (max-width: 768px) {
+        body {
+            font-size: 150%;
+        }
+        button {
+            padding: 10px;
+        }
+        input {
+            padding: 10px;
+        }
+}
