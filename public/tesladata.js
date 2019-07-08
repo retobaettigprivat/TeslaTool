@@ -11,10 +11,14 @@ let tesladata = {
     heading: unknown,
     latitude: unknown,
     longitude: unknown,
+    locked: unknown,
+    sentry_mode: unknown,
 };
 
 let teslaParseData = function(data) {
-    if (!data.success) { log(data) }
+    if (!data.success) {
+        return false;
+    }
 
     try {
         let d=data.data.response;
@@ -27,6 +31,9 @@ let teslaParseData = function(data) {
         if (typeof d.drive_state.heading !== 'undefined') { tesladata.heading = d.drive_state.heading};
         if (typeof d.drive_state.latitude !== 'undefined') { tesladata.latitude = d.drive_state.latitude};
         if (typeof d.drive_state.longitude !== 'undefined') { tesladata.longitude = d.drive_state.longitude};
+        if (typeof d.vehicle_state.locked !== 'undefined') { tesladata.locked = d.vehicle_state.locked};
+        if (typeof d.vehicle_state.sentry_mode !== 'undefined') { tesladata.sentry_mode = d.vehicle_state.sentry_mode};
+
     } catch {
         log(data);
     }

@@ -1,10 +1,10 @@
 "use strict";
 
-
+/*
 if (location.protocol != 'https:' && window.location.href.indexOf('localhost')==-1)
 {
     location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
-}
+}*/
 
 
 let appstate = {
@@ -96,8 +96,14 @@ function apiFetch(url, method, data) {
         .then((response) => {
             Hide("wait");
             return response.json();
-        })
-        .catch((err) => {
+        }).then((data) => {
+            try {
+                if (data.data.indexOf("error: 408") >= 0) {
+                    tesladata.state = "offline";
+                }
+            } catch { }
+            return data;
+        }).catch((err) => {
             Hide("wait");
             log(err.message);
         });
@@ -138,36 +144,44 @@ function getInfo() {
 
 function wakeUp() {
     apiFetch('./api/wakeup', 'POST')
-        .then(data => {
-            log(JSON.stringify(data));
+        .then(res => {
+            tesladata.state = res.data.response.state;
         });
 }
 
 function flashLights() {
     apiFetch('./api/flashlights', 'POST')
-        .then(data => {
-            log(JSON.stringify(data));
+        .then(res => {
+            if (!res.data.response.result) {
+                log(JSON.stringify(res));
+            }
         });
 }
 
 function honkHorn() {
     apiFetch('./api/honkhorn', 'POST')
         .then(data => {
-            log(JSON.stringify(data));
+            if (!res.data.response.result) {
+                log(JSON.stringify(res));
+            }
         });
 }
 
 function sentryOn() {
     apiFetch('./api/setsentrymode', 'POST', {value: true})
         .then(data => {
-            log(JSON.stringify(data));
+            if (!res.data.response.result) {
+                log(JSON.stringify(res));
+            }
         });
 }
 
 function sentryOff() {
     apiFetch('./api/setsentrymode', 'POST', {value: false})
         .then(data => {
-            log(JSON.stringify(data));
+            if (!res.data.response.result) {
+                log(JSON.stringify(res));
+            }
         });
 }
 
