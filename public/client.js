@@ -188,7 +188,7 @@ function showRawData(on) {
 function standardApiCall(url, method, value) {
     return apiFetch(url, method, value)
         .then(res => {
-            if (!res.data.response.result) {
+            if (typeof res.data.response.result === 'undefined') {
                 log(JSON.stringify(res, null, 2));
             }
             getInfo();
