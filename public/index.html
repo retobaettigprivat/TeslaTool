@@ -24,14 +24,22 @@
 </div>
 
 <div id="divlogout" style="display: none">
-    <button onclick="logout()">Logout</button>
+    <button onclick="logout()"  style="float: left">Logout</button>
+    <p id="commstats" style="float: right"></p><p style="clear: both"></p>
 </div>
-<hr>
+<div id="wakeup" style="display: none">
+    <hr>
+    <b>Wakeup</b>
+    <p id="wakestate"></p><br>
+    <button onclick="wakeUp()">Wakeup</button>
+</div>
+
 <div id="mainpage" style="display: none">
+    <hr>
+    <b>State</b>
     <div id="commands">
         <button onclick="getInfo()">Get Info</button>
         <button onclick="showRawData(true)">Show raw data</button>
-        <button onclick="wakeUp()">Wakeup</button>
         <button onclick="honkHorn()">Honk</button>
         <button onclick="flashLights()">Flash</button>
         <button onclick="sentryOn()">SentryOn</button>
@@ -45,15 +53,21 @@
     <div id="infos">
         <table id="infotable"></table>
     </div>
-    <hr>
 </div>
 <div id="rawdata" style="display: none">
-    <div id="rawdatatext"></div>
-    <button onclick="showRawData(false)">Hide raw data</button>
     <hr>
+    <b>Raw Data</b>
+    <button onclick="showRawData(false)">Hide raw data</button>
+    <pre id="rawdatatext" style="border-style: solid; border-width: 1px"></pre>
 </div>
 
-<div id="logdiv"></div>
+<div id="logwrapper">
+    <hr>
+    <b>Logfile</b>
+    <button onclick="clearLog()">Clear</button>
+    <pre id="logdiv" style="border-style: solid; border-width: 1px"></pre>
+</div>
+
 <script src="tesladata.js" type="application/javascript"></script>
 <script src="client.js" type="application/javascript"></script>
 </body>

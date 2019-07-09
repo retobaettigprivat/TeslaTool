@@ -1,14 +1,17 @@
 "use strict";
 
-
-if (location.protocol != 'https:' && window.location.href.indexOf('localhost')==-1)
+if (location.protocol != 'https:'
+    && window.location.href.indexOf('localhost')==-1
+    && window.location.href.indexOf('127.0.0.1')==-1)
 {
     location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
 }
 
-
 let appstate = {
     accessToken : false,
+    apiCallActive : false,
+    numcallsok : 0,
+    numcallsfailed : 0,
     isLoggedIn : () => { return appstate.accessToken!==false; },
 };
 
@@ -25,12 +28,21 @@ function Hide(id) {
 function renderLoggedIn() {
     Hide("divlogin");
     Show("divlogout");
-    Show("mainpage");
+    if (tesladata.state === 'online') {
+        Show("mainpage");
+        Hide("wakeup")
+    } else {
+        Hide("mainpage");
+        Show("wakeup");
+        Elem("wakestate").innerHTML="Your tesla is not online but in state: "+tesladata.state;
+    }
+
 }
 function renderLoggedOut() {
     Show("divlogin");
     Hide("divlogout");
     Hide("mainpage");
+    Hide("wakeup");
 }
 
 function renderInfos() {
@@ -48,6 +60,7 @@ function renderInfos() {
         r.push('</td></tr>');
     }
     e.innerHTML=r.join('');
+    Elem("commstats").innerHTML = appstate.numcallsok+"/"+appstate.numcallsfailed;
 }
 
 function render() {
@@ -61,9 +74,14 @@ function render() {
 
 function log(str) {
     console.log(str);
-    let l = document.getElementById("logdiv");
+    let l = Elem("logdiv");
     if (typeof l !== "undefined") {
-        l.innerHTML+=str + "<br>\n";
+        l.innerHTML+=str + "\n";
+    }
+}
+function clearLog() {
+    if (typeof Elem("logdiv") !== 'undefined') {
+        Elem("logdiv").innerHTML ="";
     }
 }
 
@@ -96,6 +114,7 @@ function apiFetchFgBg(url, method, foreground, data) {
     return fetch(url, opts)
         .then((response) => {
             Hide("wait");
+            appstate.numcallsok++;
             return response.json();
         }).then((data) => {
             try {
@@ -105,6 +124,7 @@ function apiFetchFgBg(url, method, foreground, data) {
             } catch { }
             return data;
         }).catch((err) => {
+            appstate.numcallsfailed++;
             Hide("wait");
             log(err.message);
         });
@@ -136,18 +156,27 @@ function login() {
 }
 
 function getInfo() {
-    apiFetchBg('./api/getinfo', 'GET')
-        .then(data => {
-            teslarawdata = data.data.response;
-            teslaParseData(data);
-            render();
-        });
+    if (tesladata.apiCallActive) {
+        return false;
+    } else {
+        tesladata.apiCallActive = true;
+        apiFetchBg('./api/getinfo', 'GET')
+            .then(data => {
+                tesladata.apiCallActive = false;
+                teslarawdata = data.data.response;
+                teslaParseData(data);
+                render();
+            })
+            .catch(() => {
+                tesladata.apiCallActive = false;
+            });
+    }
 }
 
 function showRawData(on) {
     if (on) {
         Show("rawdata");
-        Elem("rawdatatext").innerHTML = JSON.stringify(teslarawdata, null, "<br>");
+        Elem("rawdatatext").innerHTML = JSON.stringify(teslarawdata, null, 2);
     } else {
         Hide("rawdata");
     }
@@ -157,7 +186,7 @@ function standardApiCall(url, method, value) {
     return apiFetch(url, method, value)
         .then(res => {
             if (!res.data.response.result) {
-                log(JSON.stringify(res));
+                log(JSON.stringify(res, null, 2));
             }
             getInfo();
         });
@@ -173,6 +202,7 @@ function wakeUp() {
     standardApiCall('./api/wakeup', 'POST')
         .then(res => {
             tesladata.state = res.data.response.state;
+            log(JSON.stringify(res.data, null, 2));
         });
 }
 
@@ -207,3 +237,5 @@ function openTrunk() {
 function openFrunk() {
     standardApiCall('./api/openfrunk', 'POST');
 }
+
+window.setInterval(getInfo, 5000);
