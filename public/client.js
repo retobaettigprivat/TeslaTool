@@ -1,9 +1,11 @@
 "use strict";
 
-if (location.protocol != 'https:'
-    && window.location.href.indexOf('localhost')==-1
-    && window.location.href.indexOf('127.0.0.1')==-1)
-{
+function isDebug() {
+   return (window.location.href.indexOf('localhost')>=0
+       || window.location.href.indexOf('127.0.0.1')>=0);
+}
+
+if (location.protocol != 'https:' && !isDebug()) {
     location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
 }
 
@@ -64,6 +66,7 @@ function renderInfos() {
 }
 
 function render() {
+    if (isDebug()) { Show("logwrapper") }
     if (appstate.isLoggedIn()) {
         renderLoggedIn();
         renderInfos();
