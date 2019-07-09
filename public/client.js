@@ -48,12 +48,9 @@ function renderLoggedOut() {
 }
 
 function renderInfos() {
-    /*let s="<table></table><tr><td>hello</td><td>hello Reto</td></tr></table>";
-    let e = Elem("infos");
-    e.innerHTML=s;*/
     let e = Elem("infotable");
 
-    let r = new Array();
+    /*let r = new Array();
     for (let key in tesladata){
         r.push('<tr><td>');
         r.push(key);
@@ -61,7 +58,8 @@ function renderInfos() {
         r.push(tesladata[key]);
         r.push('</td></tr>');
     }
-    e.innerHTML=r.join('');
+    e.innerHTML=r.join('');*/
+    e.innerHTML = teslaGetTable();
     Elem("commstats").innerHTML = appstate.numcallsok+"/"+appstate.numcallsfailed;
 }
 
