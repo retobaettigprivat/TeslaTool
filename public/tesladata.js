@@ -3,52 +3,12 @@
 const unknown = "(unknown)";
 
 let teslarawdata = unknown;
-let tesladata = {
-    name : unknown,
-    battery_level : unknown,
-    state: unknown,
-    est_battery_range: unknown,
-    ideal_battery_range: unknown,
-    heading: unknown,
-    latitude: unknown,
-    longitude: unknown,
-    locked: unknown,
-    sentry_mode: unknown,
-    odometer: unknown,
-};
-
-let teslaParseData = function(data) {
-    if (typeof data.success === 'undefined') {
-        return false;
-    }
-
-    teslaParseData2(data);
-
-    try {
-        let d=data.data.response;
-        if (typeof d.display_name !== 'undefined') { tesladata.name = d.display_name};
-        if (typeof d.state !== 'undefined') { tesladata.state = d.state};
-        if (typeof d.charge_state.battery_level !== 'undefined') { tesladata.battery_level = d.charge_state.battery_level};
-        if (typeof d.charge_state.battery_range !== 'undefined') { tesladata.battery_range = d.charge_state.battery_range};
-        if (typeof d.charge_state.est_battery_range !== 'undefined') { tesladata.est_battery_range = d.charge_state.est_battery_range};
-        if (typeof d.charge_state.ideal_battery_range !== 'undefined') { tesladata.ideal_battery_range = d.charge_state.ideal_battery_range};
-        if (typeof d.drive_state.heading !== 'undefined') { tesladata.heading = d.drive_state.heading};
-        if (typeof d.drive_state.latitude !== 'undefined') { tesladata.latitude = d.drive_state.latitude};
-        if (typeof d.drive_state.longitude !== 'undefined') { tesladata.longitude = d.drive_state.longitude};
-        if (typeof d.vehicle_state.locked !== 'undefined') { tesladata.locked = d.vehicle_state.locked};
-        if (typeof d.vehicle_state.sentry_mode !== 'undefined') { tesladata.sentry_mode = d.vehicle_state.sentry_mode};
-        if (typeof d.vehicle_state.odometer !== 'undefined') { tesladata.odometer = d.vehicle_state.odometer};
-
-    } catch {
-        log(data);
-    }
-
-};
 
 let cMilesKm = function(miles) {
-    return miles * 1.60934;
-}
-let tesladata2 = {
+    return Math.round(miles * 1.60934 *10)/10;
+};
+
+let tesladata = {
     name :              {name: "Name",                  path: "display_name",                   value: unknown},
     battery_level :     {name: "Battery Level",         path: "charge_state.battery_level",     value: unknown, unit: "%"},
     state:              {name: "State",                 path: "state",                          value: unknown},
@@ -75,15 +35,15 @@ let getResponseValue = function(data, path) {
     }
 
     return value;
-}
+};
 
-let teslaParseData2 = function(data) {
+let teslaParseData = function(data) {
     if (typeof data.success === 'undefined') {
         return false;
     }
-    for (let key in tesladata2) {
-        if (tesladata2.hasOwnProperty(key)) {
-            tesladata2[key].value = getResponseValue(data, tesladata2[key].path);
+    for (let key in tesladata) {
+        if (tesladata.hasOwnProperty(key)) {
+            tesladata[key].value = getResponseValue(data, tesladata[key].path);
         }
     }
 };
@@ -91,17 +51,17 @@ let teslaParseData2 = function(data) {
 let teslaGetTable = function() {
     let s="";
     let r = new Array();
-    for (let key in tesladata2){
+    for (let key in tesladata){
         r.push('<tr><td>');
-        r.push(tesladata2[key].name);
+        r.push(tesladata[key].name);
         r.push('</td><td>');
-        if (typeof tesladata2[key].converter !== 'undefined') {
-            s=tesladata2[key].converter(tesladata2[key].value);
+        if (typeof tesladata[key].converter !== 'undefined') {
+            s=tesladata[key].converter(tesladata[key].value);
         } else {
-            s=tesladata2[key].value;
+            s=tesladata[key].value;
         }
-        if (typeof tesladata2[key].unit !== 'undefined') {
-            s+=tesladata2[key].unit;
+        if (typeof tesladata[key].unit !== 'undefined') {
+            s+=tesladata[key].unit;
         }
         r.push(s);
         r.push('</td></tr>');

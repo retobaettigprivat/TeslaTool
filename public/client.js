@@ -30,13 +30,13 @@ function Hide(id) {
 function renderLoggedIn() {
     Hide("divlogin");
     Show("divlogout");
-    if (tesladata.state === 'online') {
+    if (tesladata.state.value === 'online') {
         Show("mainpage");
         Hide("wakeup")
     } else {
         Hide("mainpage");
         Show("wakeup");
-        Elem("wakestate").innerHTML="Your tesla is not online but in state: "+tesladata.state;
+        Elem("wakestate").innerHTML="Your tesla is not online but in state: "+tesladata.state.value;
     }
 
 }
@@ -120,7 +120,7 @@ function apiFetchFgBg(url, method, foreground, data) {
         }).then((data) => {
             try {
                 if (data.data.indexOf("error: 408") >= 0) {
-                    tesladata.state = "offline";
+                    tesladata.state.value = "offline";
                 }
             } catch { }
             return data;
@@ -157,19 +157,19 @@ function login() {
 }
 
 function getInfo() {
-    if (tesladata.apiCallActive) {
+    if (appstate.apiCallActive) {
         return false;
     } else {
-        tesladata.apiCallActive = true;
+        appstate.apiCallActive = true;
         apiFetchBg('./api/getinfo', 'GET')
             .then(data => {
-                tesladata.apiCallActive = false;
+                appstate.apiCallActive = false;
                 teslarawdata = data.data.response;
                 teslaParseData(data);
                 render();
             })
             .catch(() => {
-                tesladata.apiCallActive = false;
+                appstate.apiCallActive = false;
             });
     }
 }
@@ -202,7 +202,7 @@ function logout() {
 function wakeUp() {
     standardApiCall('./api/wakeup', 'POST')
         .then(res => {
-            tesladata.state = res.data.response.state;
+            tesladata.state.value = res.data.response.state;
             log(JSON.stringify(res.data, null, 2));
         });
 }
