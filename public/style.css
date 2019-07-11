@@ -34,7 +34,7 @@ button, div, select, table, input {
     font-size: 12px;
 }
 
-input {
+input[type="text"], input[type="password"] {
     font-size: 12px;
     background-color: black;
     color: white;

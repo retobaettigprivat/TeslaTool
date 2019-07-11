@@ -162,11 +162,12 @@ function apiFetchBg (url, method, data) {
 
 
 function login() {
-    let email = document.getElementById("email").value;
-    let pw = document.getElementById("pword").value;
+    let email = Elem("email").value;
+    let pw = Elem("pword").value;
     apiFetch('./api/login', 'POST', { 'email':email, 'pw':pw})
         .then(result => {
             if (result.success) {
+                saveLogin();
                 appstate.accessToken = result.data.access_token;
                 getVehicles();
             } else {
@@ -237,6 +238,7 @@ function standardApiCall(url, method, value) {
 }
 
 function logout() {
+    localStorage.removeItem("autologin");
     standardApiCall('./api/logout', 'POST')
         .then(()=> {
             appstate.accessToken = false;
@@ -300,5 +302,26 @@ function getVehicles() {
             render();
         })
 }
+function saveLogin() {
+    if (Elem("autologin").checked) {
+        localStorage.setItem("autologin", JSON.stringify({
+            username: Elem("email").value,
+            password: Elem("pword").value
+        }))
+    }
+}
 
+function autologin() {
+    let l = localStorage.getItem("autologin")
+    if (( l === null)) {
+        return false;
+    };
+    Elem("autologin").checked = true;
+    l=JSON.parse(l);
+    Elem("email").value = l.username;
+    Elem("pword").value = l.password;
+    login();
+}
+
+autologin();
 window.setInterval(getInfo, 5000);
