@@ -6,14 +6,16 @@
     background: white;
     opacity: 0.5;
     position: fixed;
-
     z-index:99;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
 }
 
 body {
     font-family: "Verdana", "Arial", sans-serif;
+    padding: 10px;
+    background: black;
+    color: white;
 }
 
 label {
@@ -22,35 +24,31 @@ label {
     width : 200px;
 }
 
+button, div, select, table, input {
+    margin: 5px;
+    font-size: 12px;
+}
+
 input {
     font-size: 12px;
+    background-color: black;
+    color: white;
     display: block;
     width : 200px;
     border-style: none;
-    border-bottom: solid black 1px;
-    background-color: white;
+    border-bottom: solid white 1px;
 }
 
-button {
-    margin: 5px;
-}
-
-table {
-    font-size: 12px;
-}
-
-div {
-    font-size: 12px;
+div.title {
+    font-weight: bold;
 }
 
 @media only screen and (max-width: 768px) {
         body {
             font-size: 150%;
         }
-        button {
+        button, select, input {
             padding: 10px;
         }
-        input {
-            padding: 10px;
-        }
+
 }

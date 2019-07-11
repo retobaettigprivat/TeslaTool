@@ -12,9 +12,6 @@ const hosturl = "https://owner-api.teslamotors.com";
 
 const log = logger.log;
 
-// cache
-let _vehicles = {};
-
 let getDefaultOptions = function (access_token, method) {
     if (typeof method === 'undefined') {
         method = 'GET';
@@ -36,10 +33,11 @@ let getDefaultOptions = function (access_token, method) {
     return opts;
 };
 
-let getUrl = function(access_token, vehicleIndex, command) {
+let getUrl = function(access_token, vehicleId, command) {
+    // Important: vehicleId == data.response.id_s, NOT data.response.id!!!
     let url = hosturl + command;
-    if (access_token && typeof _vehicles[access_token] !== 'undefined') {
-        url = url.replace("{id}",_vehicles[access_token][vehicleIndex].id_s);
+    if (vehicleId) {
+        url = url.replace("{id}",vehicleId);
     }
     return url;
 };
@@ -60,9 +58,10 @@ let apiFetch = function(url, opt) {
         });
 };
 
-let apiPost = function (access_token, vehicleindex, command, data) {
+let apiPost = function (access_token, vehicleId, command, data) {
+    // Important: vehicleId == data.response.id_s, NOT data.response.id!!!
     // command in following form: /api/1/vehicles/{id}/wake_up
-    let url = getUrl(access_token,vehicleindex, command);
+    let url = getUrl(access_token,vehicleId, command);
 
     let opt = getDefaultOptions(access_token, "POST");
     if (typeof data !== 'undefined') {
@@ -72,9 +71,10 @@ let apiPost = function (access_token, vehicleindex, command, data) {
     return apiFetch(url, opt);
 };
 
-let apiGet = function (access_token, vehicleindex, command) {
+let apiGet = function (access_token, vehicleId, command) {
+    // Important: vehicleId == data.response.id_s, NOT data.response.id!!!
     // command in following form: /api/1/vehicles/{id}/wake_up
-    let url = getUrl(access_token, vehicleindex, command);
+    let url = getUrl(access_token, vehicleId, command);
     let opt = getDefaultOptions(access_token, "GET");
 
     return apiFetch(url, opt);
@@ -99,34 +99,23 @@ let login = function (email, password) {
         });
 };
 
-let getVehicles = function (access_token) {
-    if (typeof _vehicles[access_token] !== 'undefined') {
-        return Promise.resolve(_vehicles[access_token]);
-    }
-    return apiGet(access_token, 0, '/api/1/vehicles')
-        .then(data => {
-            _vehicles[access_token] = data.response;
-            return data;
-        });
-};
-
 let logout = function(access_token) {
-    if (typeof _vehicles[access_token] !== 'undefined') {
-        delete _vehicles[access_token];
-    }
+    return Promise.resolve({ response : {success: true}});
+    //nothing to do here
 };
 
 module.exports = {
     login: login,
     logout: logout,
-    getVehicles: getVehicles,
-    getVehicleData: (access_token, id) => apiGet(access_token, id, '/api/1/vehicles/{id}/vehicle_data'),
-    wakeUp: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/wake_up'),
-    honkHorn: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/honk_horn'),
-    flashLights: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/flash_lights'),
-    setSentryMode: (access_token, id, on) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/set_sentry_mode', { 'on' : on }),
-    lockDoors: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/door_lock'),
-    unlockDoors: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/door_unlock'),
-    openTrunk: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'rear' }),
-    openFrunk: (access_token, id) => apiPost(access_token, id, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'front' }),
+    getVehicles: (access_token) => apiGet(access_token, null, '/api/1/vehicles'),
+    // Important: vehicleId == data.response.id_s, NOT data.response.id!!!
+    getVehicleData: (access_token, vehicleId) => apiGet(access_token, vehicleId, '/api/1/vehicles/{id}/vehicle_data'),
+    wakeUp: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/wake_up'),
+    honkHorn: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/honk_horn'),
+    flashLights: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/flash_lights'),
+    setSentryMode: (access_token, vehicleId, on) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/set_sentry_mode', { 'on' : on }),
+    lockDoors: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/door_lock'),
+    unlockDoors: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/door_unlock'),
+    openTrunk: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'rear' }),
+    openFrunk: (access_token, vehicleId) => apiPost(access_token, vehicleId, '/api/1/vehicles/{id}/command/actuate_trunk', { 'which_trunk' : 'front' }),
 };

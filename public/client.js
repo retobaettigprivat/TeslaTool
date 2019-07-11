@@ -12,8 +12,11 @@ if (location.protocol != 'https:' && !isDebug()) {
 let appstate = {
     accessToken : false,
     apiCallActive : false,
+    apiCallVehicleId : 0,
     numcallsok : 0,
     numcallsfailed : 0,
+    vehicles : false,
+    selectedvehicleidx : 0,
     isLoggedIn : () => { return appstate.accessToken!==false; },
 };
 
@@ -49,24 +52,25 @@ function renderLoggedOut() {
 
 function renderInfos() {
     let e = Elem("infotable");
-
-    /*let r = new Array();
-    for (let key in tesladata){
-        r.push('<tr><td>');
-        r.push(key);
-        r.push('</td><td>');
-        r.push(tesladata[key]);
-        r.push('</td></tr>');
-    }
-    e.innerHTML=r.join('');*/
     e.innerHTML = teslaGetTable();
     Elem("commstats").innerHTML = appstate.numcallsok+"/"+appstate.numcallsfailed;
+}
+
+function renderVehicles() {
+    let e = Elem("vehicles");
+    let s = "";
+    appstate.vehicles.forEach((vehicle) => {
+       s+="<option>"+vehicle.display_name+"</option>";
+    });
+    e.innerHTML = s;
+    Elem("vehicles").selectedIndex = appstate.selectedvehicleidx;
 }
 
 function render() {
     if (isDebug()) { Show("logwrapper") }
     if (appstate.isLoggedIn()) {
         renderLoggedIn();
+        renderVehicles();
         renderInfos();
     } else {
         renderLoggedOut();
@@ -85,6 +89,23 @@ function clearLog() {
         Elem("logdiv").innerHTML ="";
     }
 }
+
+let getVehicleId = function() {
+    let idx = appstate.selectedvehicleidx;
+    if (typeof appstate.vehicles[idx] !== 'undefined') {
+        return appstate.vehicles[idx].id_s;
+    }
+    return 0;
+};
+
+function changeVehicle() {
+    appstate.selectedvehicleidx = Elem("vehicles").selectedIndex;
+    appstate.apiCallActive = false;
+    clearTeslaData();
+    render();
+    getInfo();
+}
+
 
 let getDefaultOptions = function (method) {
     if (typeof method === 'undefined') {
@@ -147,8 +168,7 @@ function login() {
         .then(result => {
             if (result.success) {
                 appstate.accessToken = result.data.access_token;
-                getInfo();
-                render();
+                getVehicles();
             } else {
                 window.alert("Access denied");
             }
@@ -157,19 +177,42 @@ function login() {
 }
 
 function getInfo() {
-    if (appstate.apiCallActive) {
+    function _startBgApiCall() {
+        appstate.apiCallActive = true;
+        appstate.apiCallVehicleId = getVehicleId();
+    }
+
+    function _finishBgApiCall() {
+        appstate.apiCallActive = false;
+    }
+
+    function _callIsActiveOrNoVehicle() {
+        return appstate.apiCallActive || !appstate.vehicles;
+    }
+
+    function _dataMatchesSelectedCar(res){
+        return res.data.response.id_s == getVehicleId()
+    }
+
+    if (_callIsActiveOrNoVehicle()) {
         return false;
     } else {
-        appstate.apiCallActive = true;
-        apiFetchBg('./api/getinfo', 'GET')
-            .then(data => {
-                appstate.apiCallActive = false;
-                teslarawdata = data.data.response;
-                teslaParseData(data);
+        _startBgApiCall();
+        apiFetchBg('./api/'+getVehicleId()+'/getinfo', 'GET')
+            .then(res => {
+                _finishBgApiCall();
+                if (typeof res.data.response !== 'undefined') {
+                    if (_dataMatchesSelectedCar(res)) {
+                        teslarawdata = res.data.response;
+                        teslaParseData(res.data.response);
+                    }
+                } else {
+                    tesladata.state.value = 'offline';
+                }
                 render();
             })
             .catch(() => {
-                appstate.apiCallActive = false;
+                _finishBgApiCall();
             });
     }
 }
@@ -186,21 +229,23 @@ function showRawData(on) {
 function standardApiCall(url, method, value) {
     return apiFetch(url, method, value)
         .then(res => {
-            if (typeof res.data.response.result === 'undefined') {
+            if (typeof res.data.response === 'undefined') {
                 log(JSON.stringify(res, null, 2));
             }
-            getInfo();
+            return res;
         });
 }
 
 function logout() {
-    appstate.accessToken = false;
-    standardApiCall('./api/logout', 'POST');
-    render();
+    standardApiCall('./api/logout', 'POST')
+        .then(()=> {
+            appstate.accessToken = false;
+            render();
+        });
 }
 
 function wakeUp() {
-    standardApiCall('./api/wakeup', 'POST')
+    standardApiCall('./api/'+getVehicleId()+'/wakeup', 'POST')
         .then(res => {
             tesladata.state.value = res.data.response.state;
             log(JSON.stringify(res.data, null, 2));
@@ -208,35 +253,52 @@ function wakeUp() {
 }
 
 function flashLights() {
-    standardApiCall('./api/flashlights', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/flashlights', 'POST');
 }
 
 function honkHorn() {
-    standardApiCall('./api/honkhorn', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/honkhorn', 'POST');
 }
 
 function sentryOn() {
-    standardApiCall('./api/setsentrymode', 'POST', {value: true});
+    standardApiCall('./api/'+getVehicleId()+'/setsentrymode', 'POST', {value: true});
 }
 
 function sentryOff() {
-    standardApiCall('./api/setsentrymode', 'POST', {value: false});
+    standardApiCall('./api/'+getVehicleId()+'/setsentrymode', 'POST', {value: false});
 }
 
 function LockDoors() {
-    standardApiCall('./api/lockdoors', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/lockdoors', 'POST');
 }
 
 function UnlockDoors() {
-    standardApiCall('./api/unlockdoors', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/unlockdoors', 'POST');
 }
 
 function openTrunk() {
-    standardApiCall('./api/opentrunk', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/opentrunk', 'POST');
 }
 
 function openFrunk() {
-    standardApiCall('./api/openfrunk', 'POST');
+    standardApiCall('./api/'+getVehicleId()+'/openfrunk', 'POST');
+}
+
+function getVehicleData() {
+    standardApiCall('./api/'+getVehicleId()+'/getvehicledata', 'GET')
+        .then((res) => {
+            log(JSON.stringify(res, null, 2));
+        })
+}
+
+function getVehicles() {
+    standardApiCall('./api/getvehicles', 'GET')
+        .then((res) => {
+            appstate.vehicles = res.data.response;
+            teslarawdata = res.data.response[0];
+            teslaParseData(res.data.response[0]);
+            render();
+        })
 }
 
 window.setInterval(getInfo, 5000);

@@ -22,10 +22,18 @@ let tesladata = {
     odometer:           {name: "Odometer",              path: "vehicle_state.odometer",         value: unknown, unit: "km", converter: cMilesKm},
 };
 
+let clearTeslaData =function() {
+    for (let key in tesladata) {
+        if (tesladata.hasOwnProperty(key)) {
+            tesladata[key].value = unknown;
+        }
+    }
+}
+
 let getResponseValue = function(data, path) {
     let value = unknown;
     try {
-        value=data.data.response;
+        value=data;
         let subpath = path.split(".");
         for (let i=0; i<subpath.length; i++) {
             value=value[subpath[i]];
@@ -38,7 +46,7 @@ let getResponseValue = function(data, path) {
 };
 
 let teslaParseData = function(data) {
-    if (typeof data.success === 'undefined') {
+    if (typeof data === 'undefined' || !data) {
         return false;
     }
     for (let key in tesladata) {

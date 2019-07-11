@@ -56,55 +56,69 @@ function handleSimplePromise(promise, res) {
         });
 }
 
-app.get('/api/getinfo', (req, res) => {
+app.get('/api/:vehicleid/getinfo', (req, res) => {
+    let vehicleid = req.params.vehicleid;
     tesla.getVehicles(getToken(req))
         .then(() => {
-            handleSimplePromise(tesla.getVehicleData(getToken(req), 0), res);
+            handleSimplePromise(tesla.getVehicleData(getToken(req), vehicleid), res);
         })
         .catch(data => {
             res.status(500).send({success: false, data : data});
         });
 });
 
+app.get('/api/:vehicleid/getvehicledata', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.getVehicleData(getToken(req), vehicleid), res);
+});
+
 app.get('/api/getvehicles', (req, res) => {
-    handleSimplePromise(tesla.getVehicles(getToken(req), 0), res);
+    handleSimplePromise(tesla.getVehicles(getToken(req)), res);
 });
 
-app.post('/api/wakeup', (req, res) => {
-    handleSimplePromise(tesla.wakeUp(getToken(req), 0), res);
+app.post('/api/:vehicleid/wakeup', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.wakeUp(getToken(req), vehicleid), res);
 });
 
-app.post('/api/honkhorn', (req, res) => {
-    handleSimplePromise(tesla.honkHorn(getToken(req), 0), res);
+app.post('/api/:vehicleid/honkhorn', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.honkHorn(getToken(req), vehicleid), res);
 });
 
-app.post('/api/flashlights', (req, res) => {
-    handleSimplePromise(tesla.flashLights(getToken(req), 0), res);
+app.post('/api/:vehicleid/flashlights', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.flashLights(getToken(req), vehicleid), res);
 });
 
-app.post('/api/setsentrymode', (req, res) => {
+app.post('/api/:vehicleid/setsentrymode', (req, res) => {
     let on = req.body.value;
-    handleSimplePromise(tesla.setSentryMode(getToken(req), 0, on), res);
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.setSentryMode(getToken(req), vehicleid, on), res);
 });
 
 app.post('/api/logout', (req, res) => {
-    handleSimplePromise(tesla.logout(getToken(req)), res);
+    handleSimplePromise(tesla.logout(), res);
 });
 
-app.post('/api/lockdoors', (req, res) => {
-    handleSimplePromise(tesla.lockDoors(getToken(req),0), res);
+app.post('/api/:vehicleid/lockdoors', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.lockDoors(getToken(req),vehicleid), res);
 });
 
-app.post('/api/unlockdoors', (req, res) => {
-    handleSimplePromise(tesla.unlockDoors(getToken(req),0), res);
+app.post('/api/:vehicleid/unlockdoors', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.unlockDoors(getToken(req),vehicleid), res);
 });
 
-app.post('/api/opentrunk', (req, res) => {
-    handleSimplePromise(tesla.openTrunk(getToken(req),0), res);
+app.post('/api/:vehicleid/opentrunk', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.openTrunk(getToken(req),vehicleid), res);
 });
 
-app.post('/api/openfrunk', (req, res) => {
-    handleSimplePromise(tesla.openFrunk(getToken(req),0), res);
+app.post('/api/:vehicleid/openfrunk', (req, res) => {
+    let vehicleid = req.params.vehicleid;
+    handleSimplePromise(tesla.openFrunk(getToken(req),vehicleid), res);
 });
 
 app.listen(PORT, () =>
