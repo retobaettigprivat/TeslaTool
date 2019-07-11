@@ -3,12 +3,17 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
-    background: white;
-    opacity: 0.5;
     position: fixed;
     z-index:99;
     top: 0;
     left: 0;
+}
+
+.spinner {
+    position: fixed;
+    top: 30%;
+    width: 40%;
+    left: 30%;
 }
 
 body {

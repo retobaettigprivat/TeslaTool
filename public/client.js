@@ -143,7 +143,7 @@ function apiFetchFgBg(url, method, foreground, data) {
                 if (data.data.indexOf("error: 408") >= 0) {
                     tesladata.state.value = "offline";
                 }
-            } catch { }
+            } catch (e) { }
             return data;
         }).catch((err) => {
             appstate.numcallsfailed++;

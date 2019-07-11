@@ -28,7 +28,7 @@ let clearTeslaData =function() {
             tesladata[key].value = unknown;
         }
     }
-}
+};
 
 let getResponseValue = function(data, path) {
     let value = unknown;
@@ -38,7 +38,7 @@ let getResponseValue = function(data, path) {
         for (let i=0; i<subpath.length; i++) {
             value=value[subpath[i]];
         }
-    } catch {
+    } catch (e){
         return unknown;
     }
 
